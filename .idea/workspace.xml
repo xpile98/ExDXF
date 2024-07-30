@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="first commit">
-      <change afterPath="$PROJECT_DIR$/dxf_examples/20170428_E60_20x5.652_R2.dxf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dxf_examples/e66s_21.50mm_12.64mm_20240127_0차.dxf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dxf_examples/e66s_21.50mm_12.64mm_20240127_5차(4대4).dxf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dxf_examples/test_Fitting.dxf" afterDir="false" />
+    <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="line order visualiztion -ok">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test_line-order.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_line-order.py" afterDir="false" />
     </list>
@@ -85,7 +81,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722299794850</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="line order visualiztion -ok">
+      <option name="closed" value="true" />
+      <created>1722302621943</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1722302621943</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -101,6 +105,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="first commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="first commit" />
+    <MESSAGE value="line order visualiztion -ok" />
+    <option name="LAST_COMMIT_MESSAGE" value="line order visualiztion -ok" />
   </component>
 </project>
