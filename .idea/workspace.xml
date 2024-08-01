@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="apply UI (simulation test)">
+      <change afterPath="$PROJECT_DIR$/test_ui(click-line).py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,16 +44,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.__init__.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_line-order.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_ui.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/02_ELSE/03_Python/EzDXF/EzDXF/dxf_examples&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.__init__.executor": "Run",
+    "Python.test_line-order.executor": "Run",
+    "Python.test_ui(click-line).executor": "Debug",
+    "Python.test_ui.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "D:/02_ELSE/03_Python/EzDXF/EzDXF/dxf_examples"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\02_ELSE\03_Python\EzDXF\EzDXF\dxf_examples" />
@@ -115,7 +116,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722391941206</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="apply UI (simulation test)">
+      <option name="closed" value="true" />
+      <created>1722501154001</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1722501154001</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -136,5 +145,16 @@
     <MESSAGE value="apply UI" />
     <MESSAGE value="apply UI (simulation test)" />
     <option name="LAST_COMMIT_MESSAGE" value="apply UI (simulation test)" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test_ui(click-line).py</url>
+          <line>245</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
