@@ -29,7 +29,7 @@ class DXFViewer(QMainWindow):
         self.path_points = []  # 시뮬레이션 경로를 저장할 리스트
         self.current_point_index = 0  # 현재 이동 중인 점의 인덱스
         self.current_path = []  # 현재 선의 모든 점들
-        self.speed = 1.0  # 이동 속도 (단위 시간당 거리)
+        self.speed = 8.0  # 이동 속도 (단위 시간당 거리)
 
         self.initUI()
 
@@ -264,10 +264,19 @@ class DXFViewer(QMainWindow):
     def update_simulation_path(self):
         if self.simulating:
             # 현재 위치를 기준으로 남은 경로를 재보간
-            current_position = self.current_path[self.simulation_step] if self.simulation_step < len(self.current_path) else self.current_path[-1]
-            remaining_path = [current_position] + self.path_points[self.current_point_index+1:]
+            if self.simulation_step < len(self.current_path):
+                current_position = self.current_path[self.simulation_step]
+            else:
+                current_position = self.current_path[-1]
+
+            # 현재 위치에서 남은 경로 계산
+            remaining_path = [current_position] + self.path_points[self.current_point_index + 1:]
+
+            # 현재 위치에서 경로 재보간
             self.current_path = self.interpolate_points(remaining_path, self.speed)
-            self.simulation_step = 0  # 경로 재보간 시 현재 위치에서 시작하도록 초기화
+
+            # 현재 위치 업데이트
+            self.simulation_step = 0
 
     def start_simulation(self):
         if not self.simulating:
@@ -299,14 +308,17 @@ class DXFViewer(QMainWindow):
             start = np.array(points[i])
             end = np.array(points[i + 1])
             distance = np.linalg.norm(end - start)
-            num_steps = max(int(distance / speed), 1)  # 최소 한 스텝은 필요
-            for step in range(num_steps):
-                interpolated_point = start + (end - start) * (step / num_steps)
-                interpolated_points.append(interpolated_point)
-        interpolated_points.append(points[-1])  # 마지막 점 추가
+            if distance > 0:
+                num_steps = max(int(distance / speed), 1)  # 최소 한 스텝은 필요
+                for step in range(num_steps):
+                    interpolated_point = start + (end - start) * (step / num_steps)
+                    interpolated_points.append(interpolated_point)
+            # 마지막 점만 추가하여 다음 선의 시작점으로 바로 점프
+            interpolated_points.append(end)
         return interpolated_points
 
     def update_simulation(self):
+        # 시뮬레이션이 끝났는지 확인
         if self.simulation_step >= len(self.current_path):
             self.timer.stop()
             self.simulating = False
@@ -330,11 +342,21 @@ class DXFViewer(QMainWindow):
                 end = entity.dxf.end
                 ax.plot([start.x, end.x], [start.y, end.y], color='black')
 
-        # 빨간색 원을 현재 경로 포인트에 그리기
+        # 레이저 효과를 주기 위해 현재 경로 포인트에 레이저 스타일로 그리기
         if self.current_path:
             x, y = self.current_path[self.simulation_step]
-            red_circle = plt.Circle((x, y), radius=1, edgecolor='red', facecolor='red')
-            ax.add_artist(red_circle)
+
+            # 레이저 빛나는 효과를 점선으로 표현
+            ax.plot(x, y, 'ro', markersize=5, markeredgewidth=2, markeredgecolor='darkred', alpha=0.8)
+            ax.plot(x, y, 'ro', markersize=10, markeredgewidth=1, markeredgecolor='red', alpha=0.5)
+
+            # 레이저 꼬리 효과
+            if self.simulation_step > 0:
+                previous_points = self.current_path[max(0, self.simulation_step - 5):self.simulation_step]
+                prev_x, prev_y = zip(*previous_points)
+                ax.plot(prev_x, prev_y, 'r--', linewidth=5, alpha=0.5)  # 점선으로 레이저 경로 표현
+
+            self.current_position = (x, y)  # 현재 위치 업데이트
 
         ax.set_title('DXF Entities Simulation')
         ax.set_xlabel('X')
@@ -344,7 +366,24 @@ class DXFViewer(QMainWindow):
 
         self.canvas.draw()
 
-        self.simulation_step += 1
+        # 다음 선으로 바로 점프할 때 simulation_step을 즉시 증가
+        if self.simulation_step < len(self.current_path) - 1:
+            next_point = self.current_path[self.simulation_step + 1]
+            if np.allclose(np.array(next_point), np.array((x, y)), atol=1e-7):
+                # 다음 점이 같은 위치라면 한 번만 증가
+                self.simulation_step += 1
+            else:
+                # 다른 위치라면 다음 선의 시작점으로 즉시 점프
+                self.simulation_step += 1
+                while self.simulation_step < len(self.current_path) - 1:
+                    current_point = self.current_path[self.simulation_step]
+                    next_point = self.current_path[self.simulation_step + 1]
+                    if not np.allclose(np.array(current_point), np.array(next_point), atol=1e-7):
+                        break
+                    self.simulation_step += 1
+        else:
+            # 마지막 점에 도달했을 때 증가
+            self.simulation_step += 1
 
     def show_slider_dialog(self):
         self.slider_dialog = QDialog(self)
@@ -357,7 +396,7 @@ class DXFViewer(QMainWindow):
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setMinimum(1)
         self.slider.setMaximum(100)
-        self.slider.setValue(10)  # 초기 속도 설정
+        self.slider.setValue(80)  # 초기 속도 설정
         self.slider.valueChanged.connect(self.change_speed)
         layout.addWidget(self.slider)
 
