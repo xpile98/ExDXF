@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="apply UI (simulation test)">
-      <change afterPath="$PROJECT_DIR$/test_ui(click-line).py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="line click test">
+      <change afterPath="$PROJECT_DIR$/test_ui(options).py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +47,7 @@
   "keyToString": {
     "Python.__init__.executor": "Run",
     "Python.test_line-order.executor": "Run",
-    "Python.test_ui(click-line).executor": "Debug",
+    "Python.test_ui(click-line).executor": "Run",
     "Python.test_ui.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
@@ -124,7 +123,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722501154001</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="line click test">
+      <option name="closed" value="true" />
+      <created>1722502485069</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1722502485069</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -144,7 +151,8 @@
     <MESSAGE value="line order visualiztion 2 -ok" />
     <MESSAGE value="apply UI" />
     <MESSAGE value="apply UI (simulation test)" />
-    <option name="LAST_COMMIT_MESSAGE" value="apply UI (simulation test)" />
+    <MESSAGE value="line click test" />
+    <option name="LAST_COMMIT_MESSAGE" value="line click test" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
