@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="line click test">
-      <change afterPath="$PROJECT_DIR$/test_ui(pyqtgraph).py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/EzDXF.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/EzDXF.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_ui(pyqtgraph).py" beforeDir="false" afterPath="$PROJECT_DIR$/test_ui(pyqtgraph).py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,12 +31,12 @@
     &quot;assignee&quot;: &quot;xpile98&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/xpile98/ExDXF.git&quot;,
-    &quot;accountId&quot;: &quot;9de07e40-3f2f-4ad5-9930-08f833cfaa6d&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/xpile98/ExDXF.git",
+    "accountId": "555cfa95-db02-4b4e-9467-634b20b092df"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -44,19 +46,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.__init__.executor": "Run",
-    "Python.test_line-order.executor": "Run",
-    "Python.test_ui(click-line).executor": "Run",
-    "Python.test_ui(options).executor": "Run",
-    "Python.test_ui(pyqtgraph).executor": "Run",
-    "Python.test_ui.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "D:/02_ELSE/03_Python/EzDXF/EzDXF/dxf_examples"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.__init__.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_line-order.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_ui(click-line).executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_ui(options).executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_ui(pyqtgraph).executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_ui.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/02_ELSE/03_Python/EzDXF/EzDXF/dxf_examples&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\02_ELSE\03_Python\EzDXF\EzDXF\dxf_examples" />
@@ -65,7 +67,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-5b207ade9991-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17890.14" />
+        <option value="bundled-python-sdk-975db3bf15a3-31b6be0877a2-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.18034.82" />
       </set>
     </attachedChunks>
   </component>
@@ -175,5 +177,10 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="dy" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

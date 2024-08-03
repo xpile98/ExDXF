@@ -1,11 +1,11 @@
 import sys
 import ezdxf
 import pyqtgraph as pg
-from pyqtgraph import PlotWidget, plot
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QListWidget, \
     QMessageBox, QMenuBar, QAction, QFileDialog, QListWidgetItem, QAbstractItemView, QSlider, QLabel, QDialog
-from PyQt5.QtCore import Qt, QTimer, QPointF
+from PyQt5.QtCore import Qt, QTimer
 import numpy as np
+
 
 class DXFViewer(QMainWindow):
     def __init__(self, dxf_path=None):
@@ -29,14 +29,13 @@ class DXFViewer(QMainWindow):
         self.path_points = []  # 시뮬레이션 경로를 저장할 리스트
         self.current_point_index = 0  # 현재 이동 중인 점의 인덱스
         self.current_path = []  # 현재 선의 모든 점들
-        self.speed = 1.0  # 이동 속도 (단위 시간당 거리)
-
+        self.speed = 5.0  # 이동 속도 (단위 시간당 거리)
 
         # 기본 색상 설정
         self.line_color = 'white'
-        self.selected_line_color = 'green'
+        self.selected_line_color = (144, 238, 144)
         self.arrow_color = 'red'
-        self.order_text_color = 'blue'
+        self.order_text_color = (144, 238, 144)
 
         self.initUI()
 
@@ -111,9 +110,13 @@ class DXFViewer(QMainWindow):
         left_layout.addLayout(button_layout)
 
         # PyQtGraph PlotWidget으로 변경
-        self.plot_widget = PlotWidget()
+        self.plot_widget = pg.PlotWidget()
         self.plot_item = self.plot_widget.getPlotItem()
         self.plot_item.showGrid(x=True, y=True)
+
+        # Ensure that the aspect ratio does not lock the scaling of axes
+        self.plot_widget.setAspectLocked(True)
+
         self.plot_widget.scene().sigMouseClicked.connect(self.on_canvas_click)  # 마우스 클릭 이벤트 연결
         right_layout.addWidget(self.plot_widget)
 
@@ -211,6 +214,8 @@ class DXFViewer(QMainWindow):
     def visualize_entities(self):
         self.plot_widget.clear()
 
+        tolerance = 1  # Customize this value as needed
+
         for idx, (entity, visible) in enumerate(zip(self.entities, self.entity_visibility)):
             if not visible:
                 continue
@@ -219,12 +224,33 @@ class DXFViewer(QMainWindow):
                 vertices = entity.get_points('xy')
                 x, y = zip(*vertices)
                 self.plot_widget.plot(x, y, pen=color)
-                if self.show_direction:
-                    for i in range(len(vertices) - 1):
-                        start = vertices[i]
-                        end = vertices[i + 1]
-                        arrow = pg.ArrowItem(pos=(start[0], start[1]), angle=0, tipAngle=45, baseAngle=30, headLen=10, tailLen=0, brush=self.arrow_color)
-                        self.plot_item.addItem(arrow)
+                if self.show_direction and len(vertices) > 1:
+                    # 첫 번째 선분의 방향을 첫 번째 점에서 두 번째 점으로
+                    start = vertices[0]
+                    end = vertices[1]
+                    dx = end[0] - start[0]
+                    dy = end[1] - start[1]
+
+                    # 기울기를 기준으로 수평과 수직을 구분
+                    if np.isclose(dy, 0, atol=tolerance):  # 수평선
+                        if dx > 0:
+                            arrow_angle = 180  # 오른쪽
+                        else:
+                            arrow_angle = 0  # 왼쪽
+                    elif np.isclose(dx, 0, atol=tolerance):  # 수직선
+                        if dy > 0:
+                            arrow_angle = 90  # 위쪽
+                        else:
+                            arrow_angle = -90  # 아래쪽
+                    else:
+                        # 대각선 방향을 처리 (45도 간격으로)
+                        angle = np.degrees(np.arctan2(dy, dx))
+                        arrow_angle = angle
+
+                    arrow = pg.ArrowItem(pos=(start[0], start[1]), angle=arrow_angle, tipAngle=45, baseAngle=30,
+                                         headLen=10,
+                                         tailLen=0, brush=self.arrow_color)
+                    self.plot_item.addItem(arrow)
                 if self.show_order:
                     start_x, start_y = vertices[0]
                     text = pg.TextItem(text=str(idx + 1), color=self.order_text_color, anchor=(0, 0))
@@ -235,7 +261,29 @@ class DXFViewer(QMainWindow):
                 end = entity.dxf.end
                 self.plot_widget.plot([start.x, end.x], [start.y, end.y], pen=color)
                 if self.show_direction:
-                    arrow = pg.ArrowItem(pos=(start.x, start.y), angle=0, tipAngle=45, baseAngle=30, headLen=10, tailLen=0, brush=self.arrow_color)
+                    # 선분의 방향을 첫 번째 점에서 두 번째 점으로
+                    dx = end.x - start.x
+                    dy = end.y - start.y
+
+                    # 기울기를 기준으로 수평과 수직을 구분
+                    if np.isclose(dy, 0, atol=tolerance):  # 수평선
+                        if dx > 0:
+                            arrow_angle = 180  # 오른쪽
+                        else:
+                            arrow_angle = 0  # 왼쪽
+                    elif np.isclose(dx, 0, atol=tolerance):  # 수직선
+                        if dy > 0:
+                            arrow_angle = 90  # 위쪽
+                        else:
+                            arrow_angle = -90  # 아래쪽
+                    else:
+                        # 대각선 방향을 처리 (45도 간격으로)
+                        angle = np.degrees(np.arctan2(dy, dx))
+                        arrow_angle = angle
+
+                    arrow = pg.ArrowItem(pos=(start.x, start.y), angle=arrow_angle, tipAngle=45, baseAngle=30,
+                                         headLen=10,
+                                         tailLen=0, brush=self.arrow_color)
                     self.plot_item.addItem(arrow)
                 if self.show_order:
                     text = pg.TextItem(text=str(idx + 1), color=self.order_text_color, anchor=(0, 0))
@@ -365,6 +413,14 @@ class DXFViewer(QMainWindow):
             self.current_point_index = 0
             self.current_path = self.interpolate_points(self.path_points, self.speed)  # 초기 경로 보간
             self.show_slider_dialog()  # 슬라이더 팝업 표시
+
+            # "View All" 기능을 통해 모든 엔티티가 보이도록 설정
+            self.plot_widget.getViewBox().autoRange()  # View all entities
+
+            # 방향 및 순서 표시 숨기기
+            self.direction_action.setChecked(False)
+            self.order_action.setChecked(False)
+
             self.timer.start(10)  # 100ms 간격으로 타이머 실행
 
     def get_path_points(self):
@@ -403,6 +459,11 @@ class DXFViewer(QMainWindow):
             self.simulating = False
             self.slider_dialog.close()  # 슬라이더 팝업 닫기
             QMessageBox.information(self, "Simulation", "Simulation finished!")
+
+            # 시뮬레이션 종료 후 원래 보기 옵션 복원
+            self.direction_action.setChecked(True)
+            self.order_action.setChecked(True)
+            self.visualize_entities()
             return
 
         self.plot_widget.clear()
@@ -414,11 +475,11 @@ class DXFViewer(QMainWindow):
             if entity.dxftype() == 'LWPOLYLINE':
                 vertices = entity.get_points('xy')
                 x, y = zip(*vertices)
-                self.plot_widget.plot(x, y, pen='white')
+                self.plot_widget.plot(x, y, pen = self.line_color)
             elif entity.dxftype() == 'LINE':
                 start = entity.dxf.start
                 end = entity.dxf.end
-                self.plot_widget.plot([start.x, end.x], [start.y, end.y], pen='white')
+                self.plot_widget.plot([start.x, end.x], [start.y, end.y], pen = self.line_color)
 
         # 레이저 효과를 주기 위해 현재 경로 포인트에 레이저 스타일로 그리기
         if self.current_path:
@@ -431,18 +492,18 @@ class DXFViewer(QMainWindow):
             # 레이저 꼬리 효과
             if self.simulation_step > 0:
                 previous_points = self.current_path[max(0, self.simulation_step - 5):self.simulation_step]
-                tail_x, tail_y = zip(*previous_points)
-                tail_x = np.array(tail_x)  # Convert to 1D ndarray
-                tail_y = np.array(tail_y)  # Convert to 1D ndarray
-                tail = pg.PlotCurveItem(tail_x, tail_y, pen=pg.mkPen('red', style=Qt.DashLine))
-                self.plot_item.addItem(tail)
+                if previous_points:  # Ensure there are previous points
+                    tail_x, tail_y = zip(*previous_points)
+                    tail_x = np.array(tail_x)  # Convert to 1D ndarray
+                    tail_y = np.array(tail_y)  # Convert to 1D ndarray
+                    tail = pg.PlotCurveItem(tail_x, tail_y, pen=pg.mkPen('red', style=Qt.DashLine))
+                    self.plot_item.addItem(tail)
 
             self.current_position = (x, y)  # 현재 위치 업데이트
 
         self.plot_widget.setTitle('DXF Entities Simulation')
         self.plot_widget.setLabel('left', 'Y')
         self.plot_widget.setLabel('bottom', 'X')
-        self.plot_widget.setAspectLocked()
 
         # 다음 선으로 바로 점프할 때 simulation_step을 즉시 증가
         if self.simulation_step < len(self.current_path) - 1:
@@ -481,6 +542,7 @@ class DXFViewer(QMainWindow):
         self.slider_dialog.setLayout(layout)
         self.slider_dialog.setWindowModality(Qt.ApplicationModal)
         self.slider_dialog.show()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
