@@ -29,7 +29,7 @@ class DXFViewer(QMainWindow):
         self.path_points = []  # 시뮬레이션 경로를 저장할 리스트
         self.current_point_index = 0  # 현재 이동 중인 점의 인덱스
         self.current_path = []  # 현재 선의 모든 점들
-        self.speed = 5.0  # 이동 속도 (단위 시간당 거리)
+        self.speed = 8.0  # 이동 속도 (단위 시간당 거리)
 
         # 기본 색상 설정
         self.line_color = 'white'
@@ -533,9 +533,9 @@ class DXFViewer(QMainWindow):
         layout.addWidget(slider_label)
 
         self.slider = QSlider(Qt.Horizontal)
-        self.slider.setMinimum(1)
-        self.slider.setMaximum(100)
-        self.slider.setValue(50)  # 초기 속도 설정
+        self.slider.setMinimum(50)
+        self.slider.setMaximum(150)
+        self.slider.setValue(80)  # 초기 속도 설정
         self.slider.valueChanged.connect(self.change_speed)
         layout.addWidget(self.slider)
 
@@ -546,7 +546,7 @@ class DXFViewer(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    dxf_path = 'test3.dxf'  # 기본 DXF 파일 경로
+    dxf_path = 'test4.dxf'  # 기본 DXF 파일 경로
     viewer = DXFViewer(dxf_path)
     viewer.show()
     sys.exit(app.exec_())
