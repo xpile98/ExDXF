@@ -82,7 +82,7 @@ class DXFViewer(QMainWindow):
 
         self.list_widget = QListWidget()
         self.list_widget.setSelectionMode(QAbstractItemView.SingleSelection)  # 단일 선택 모드로 변경
-        self.list_widget.itemSelectionChanged.connect(self.on_list_selection_change)
+        self.list_widget.itemChanged.connect(self.update_entity_visibility)
         left_layout.addWidget(self.list_widget)
 
         button_layout = QVBoxLayout()
@@ -356,12 +356,6 @@ class DXFViewer(QMainWindow):
         self.selected_entity_index = index
         self.update_list_widget_selection(index)
 
-    def on_list_selection_change(self):
-        selected_items = self.list_widget.selectedItems()
-        if selected_items:
-            self.selected_entity_index = selected_items[0].data(Qt.UserRole)
-            self.visualize_entities()
-
     def load_file(self):
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self, "Open DXF File", "", "DXF Files (*.dxf);;All Files (*)",
@@ -546,7 +540,7 @@ class DXFViewer(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    dxf_path = 'test4.dxf'  # 기본 DXF 파일 경로
+    dxf_path = 'test3.dxf'  # 기본 DXF 파일 경로
     viewer = DXFViewer(dxf_path)
     viewer.show()
     sys.exit(app.exec_())
