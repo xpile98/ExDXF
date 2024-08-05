@@ -2,7 +2,7 @@ import sys
 import ezdxf
 import pyqtgraph as pg
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QListWidget, \
-    QMessageBox, QMenuBar, QAction, QFileDialog, QListWidgetItem, QAbstractItemView, QSlider, QLabel, QDialog
+    QMessageBox, QMenuBar, QAction, QFileDialog, QListWidgetItem, QAbstractItemView, QSlider, QLabel, QDialog, QInputDialog
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont
 import numpy as np
@@ -47,41 +47,57 @@ class DXFViewer(QMainWindow):
         self.menuBar = QMenuBar(self)
         self.setMenuBar(self.menuBar)
 
-        file_menu = self.menuBar.addMenu('File')
+        file_menu = self.menuBar.addMenu('파일')
 
-        load_action = QAction('Load DXF', self)
+        load_action = QAction('DXF 파일 불러오기', self)
         load_action.triggered.connect(self.load_file)
         file_menu.addAction(load_action)
 
-        save_action = QAction('Save As', self)
+        save_action = QAction('다른 이름으로 저장', self)
         save_action.triggered.connect(self.save_file)
         file_menu.addAction(save_action)
 
-        view_menu = self.menuBar.addMenu('View')
+        view_menu = self.menuBar.addMenu('보기')
 
-        self.direction_action = QAction('Show Direction', self, checkable=True)
+        self.direction_action = QAction('선 방향 표시', self, checkable=True)
         self.direction_action.setChecked(True)
         self.direction_action.triggered.connect(self.toggle_show_direction)
         view_menu.addAction(self.direction_action)
 
-        self.order_action = QAction('Show Order', self, checkable=True)
+        self.order_action = QAction('선 순서 표시', self, checkable=True)
         self.order_action.setChecked(True)
         self.order_action.triggered.connect(self.toggle_show_order)
         view_menu.addAction(self.order_action)
 
         # Simulate action 추가
-        self.simulate_action = QAction('Simulate', self)
+        self.simulate_action = QAction('레이저 커팅 시뮬레이션', self)
         self.simulate_action.triggered.connect(self.start_simulation)
         view_menu.addAction(self.simulate_action)
 
         # Add Show All Lines and Hide All Lines to the View menu
-        show_all_action = QAction('Show All Lines', self)
+        show_all_action = QAction('모든 선 표시', self)
         show_all_action.triggered.connect(self.show_all_entities)
         view_menu.addAction(show_all_action)
 
-        hide_all_action = QAction('Hide All Lines', self)
+        hide_all_action = QAction('모든 선 숨기기', self)
         hide_all_action.triggered.connect(self.hide_all_entities)
         view_menu.addAction(hide_all_action)
+
+        edit_menu = self.menuBar.addMenu('편집')
+
+        # initUI 내에 메뉴 액션 추가
+        job_editor_action = QAction('커팅 도면 편집', self)
+        job_editor_action.triggered.connect(self.open_job_editor)
+        edit_menu.addAction(job_editor_action)
+
+        top_left_sort_action = QAction('정렬: 좌상단', self)
+        top_left_sort_action.triggered.connect(self.sort_top_left)
+        edit_menu.addAction(top_left_sort_action)
+
+        bottom_right_sort_action = QAction('정렬: 우하단', self)
+        bottom_right_sort_action.triggered.connect(self.sort_bottom_right)
+        edit_menu.addAction(bottom_right_sort_action)
+
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -97,25 +113,21 @@ class DXFViewer(QMainWindow):
 
         button_layout = QVBoxLayout()
 
-        up_button = QPushButton('Move Up')
-        up_button.clicked.connect(self.move_up)
-        button_layout.addWidget(up_button)
+        change_order_button = QPushButton('선 순서 변경')
+        change_order_button.clicked.connect(self.change_order)
+        button_layout.addWidget(change_order_button)
 
-        down_button = QPushButton('Move Down')
-        down_button.clicked.connect(self.move_down)
-        button_layout.addWidget(down_button)
-
-        delete_button = QPushButton('Delete Selected')
-        delete_button.clicked.connect(self.delete_selected)
-        button_layout.addWidget(delete_button)
-
-        reverse_button = QPushButton('Reverse Order Selected')
+        reverse_button = QPushButton('선 방향 반전')
         reverse_button.clicked.connect(self.reverse_order_selected)
         button_layout.addWidget(reverse_button)
 
-        apply_button = QPushButton('Apply Order')
-        apply_button.clicked.connect(self.apply_order)
-        button_layout.addWidget(apply_button)
+        delete_button = QPushButton('선 삭제')
+        delete_button.clicked.connect(self.delete_selected)
+        button_layout.addWidget(delete_button)
+
+        init_button = QPushButton('초기화')
+        init_button.clicked.connect(self.init_order)
+        button_layout.addWidget(init_button)
 
         left_layout.addLayout(button_layout)
 
@@ -138,6 +150,8 @@ class DXFViewer(QMainWindow):
         self.msp = self.doc.modelspace()
         self.entities = list(self.msp.query('LWPOLYLINE LINE'))
         self.entity_visibility = [True] * len(self.entities)
+        self.dxf_path = file_path  # Store the current file path
+        self.setWindowTitle(f'LSTech DXF Editor  [{file_path}]')  # Update window title with file name
         self.update_list_widget()
         self.visualize_entities()
 
@@ -177,23 +191,32 @@ class DXFViewer(QMainWindow):
         self.entity_visibility[index] = item.checkState() == Qt.Checked
         self.visualize_entities()
 
-    def move_up(self):
+    def change_order(self):
+        # 현재 선택된 항목의 인덱스를 가져옴
         current_row = self.list_widget.currentRow()
-        if current_row > 0:
-            current_item = self.list_widget.takeItem(current_row)
-            self.list_widget.insertItem(current_row - 1, current_item)
-            self.list_widget.setCurrentRow(current_row - 1)
-            self.swap_entities(current_row, current_row - 1)
-            self.update_list_widget_selection(current_row - 1)
+        if current_row == -1:
+            QMessageBox.warning(self, "Warning", "Please select an entity to swap.")
+            return
 
-    def move_down(self):
-        current_row = self.list_widget.currentRow()
-        if current_row < self.list_widget.count() - 1:
+        # 다른 엔티티를 선택하기 위한 대화상자 표시
+        item_names = [self.list_widget.item(i).text() for i in range(self.list_widget.count())]
+        target_item, ok = QInputDialog.getItem(self, "Select Entity", "Select entity to swap with:", item_names, 0,
+                                               False)
+
+        if ok and target_item:
+            target_row = item_names.index(target_item)
+
+            # Swap entities in the data model
+            self.swap_entities(current_row, target_row)
+
+            # Swap entities in the list widget
             current_item = self.list_widget.takeItem(current_row)
-            self.list_widget.insertItem(current_row + 1, current_item)
-            self.list_widget.setCurrentRow(current_row + 1)
-            self.swap_entities(current_row, current_row + 1)
-            self.update_list_widget_selection(current_row + 1)
+            target_item = self.list_widget.takeItem(target_row - 1 if current_row < target_row else target_row)
+            self.list_widget.insertItem(current_row, target_item)
+            self.list_widget.insertItem(target_row, current_item)
+            self.list_widget.setCurrentRow(target_row)
+
+            self.update_list_widget_selection(target_row)
 
     def swap_entities(self, index1, index2):
         self.entities[index1], self.entities[index2] = self.entities[index2], self.entities[index1]
@@ -224,7 +247,7 @@ class DXFViewer(QMainWindow):
                 entity.set_points(reversed_points)
             self.visualize_entities()
 
-    def apply_order(self):
+    def init_order(self):
         order = [self.list_widget.item(i).data(Qt.UserRole) for i in range(self.list_widget.count())]
         self.entities = [self.entities[i] for i in order]
         self.entity_visibility = [self.entity_visibility[i] for i in order]
@@ -571,10 +594,235 @@ class DXFViewer(QMainWindow):
         self.slider_dialog.setWindowModality(Qt.ApplicationModal)
         self.slider_dialog.show()
 
+    # 메인 윈도우에 JobEditorDialog를 추가하는 부분
+    def open_job_editor(self):
+        dialog = JobEditorDialog(self.entities, self)
+        dialog.exec_()
+
+    def sort_top_left(self):
+        horizontal_lines = [e for e in self.entities if self.is_horizontal(e)]
+        vertical_lines = [e for e in self.entities if self.is_vertical(e)]
+
+        # Sort horizontal lines by y first (bottom to top), then by x (left to right)
+        horizontal_lines.sort(key=lambda e: (
+            -e.dxf.start.y if e.dxftype() == 'LINE' else -e.get_points('xy')[0][1],
+            e.dxf.start.x if e.dxftype() == 'LINE' else e.get_points('xy')[0][0]
+        ))
+
+        # Sort vertical lines by x first (left to right), then by y (top to bottom)
+        vertical_lines.sort(key=lambda e: (
+            e.dxf.start.x if e.dxftype() == 'LINE' else e.get_points('xy')[0][0],
+            e.dxf.start.y if e.dxftype() == 'LINE' else e.get_points('xy')[0][1]
+        ))
+
+        # Reverse direction of horizontal lines if needed
+        for entity in horizontal_lines:
+            self.ensure_direction(entity, left_to_right=True)
+
+        # Reverse direction of vertical lines if needed
+        for entity in vertical_lines:
+            self.ensure_direction(entity, top_to_bottom=True)
+
+        # Combine sorted lines
+        self.entities = horizontal_lines + vertical_lines
+        self.update_list_widget()
+        self.visualize_entities()
+
+    def sort_bottom_right(self):
+        horizontal_lines = [e for e in self.entities if self.is_horizontal(e)]
+        vertical_lines = [e for e in self.entities if self.is_vertical(e)]
+
+        # Sort horizontal lines by y first (top to bottom), then by x (right to left)
+        horizontal_lines.sort(key=lambda e: (
+            e.dxf.start.y if e.dxftype() == 'LINE' else e.get_points('xy')[0][1],
+            -e.dxf.start.x if e.dxftype() == 'LINE' else -e.get_points('xy')[0][0]
+        ))
+
+        # Sort vertical lines by x first (right to left), then by y (bottom to top)
+        vertical_lines.sort(key=lambda e: (
+            -e.dxf.start.x if e.dxftype() == 'LINE' else -e.get_points('xy')[0][0],
+            -e.dxf.start.y if e.dxftype() == 'LINE' else -e.get_points('xy')[0][1]
+        ))
+
+        # Reverse direction of horizontal lines if needed
+        for entity in horizontal_lines:
+            self.ensure_direction(entity, left_to_right=False)
+
+        # Reverse direction of vertical lines if needed
+        for entity in vertical_lines:
+            self.ensure_direction(entity, top_to_bottom=False)
+
+        # Combine sorted lines
+        self.entities = horizontal_lines + vertical_lines
+        self.update_list_widget()
+        self.visualize_entities()
+
+    def ensure_direction(self, entity, left_to_right=True, top_to_bottom=True):
+        if entity.dxftype() == 'LINE':
+            start = entity.dxf.start
+            end = entity.dxf.end
+            if self.is_horizontal(entity):
+                # Horizontal line
+                if left_to_right and start.x > end.x:
+                    # Reverse direction if not left-to-right
+                    entity.dxf.start, entity.dxf.end = end, start
+                elif not left_to_right and start.x < end.x:
+                    # Reverse direction if not right-to-left
+                    entity.dxf.start, entity.dxf.end = end, start
+            elif self.is_vertical(entity):
+                # Vertical line
+                if top_to_bottom and start.y > end.y:
+                    # Reverse direction if not top-to-bottom
+                    entity.dxf.start, entity.dxf.end = end, start
+                elif not top_to_bottom and start.y < end.y:
+                    # Reverse direction if not bottom-to-top
+                    entity.dxf.start, entity.dxf.end = end, start
+
+        elif entity.dxftype() == 'LWPOLYLINE':
+            points = entity.get_points('xy')
+            start = points[0]
+            end = points[1]  # Check the direction based on the first segment
+            if self.is_horizontal(entity):
+                # Horizontal line
+                if left_to_right and start[0] > end[0]:
+                    entity.set_points(list(reversed(points)))
+                elif not left_to_right and start[0] < end[0]:
+                    entity.set_points(list(reversed(points)))
+            elif self.is_vertical(entity):
+                # Vertical line
+                if top_to_bottom and start[1] < end[1]:
+                    entity.set_points(list(reversed(points)))
+                elif not top_to_bottom and start[1] > end[1]:
+                    entity.set_points(list(reversed(points)))
+
+    def is_horizontal(self, entity, tolerance=1.0):
+        if entity.dxftype() == 'LINE':
+            return np.isclose(entity.dxf.start.y, entity.dxf.end.y, atol=tolerance)
+        elif entity.dxftype() == 'LWPOLYLINE':
+            points = entity.get_points('xy')
+            return all(np.isclose(y1, y2, atol=tolerance) for (x1, y1), (x2, y2) in zip(points[:-1], points[1:]))
+        return False
+
+    def is_vertical(self, entity, tolerance=1.0):
+        if entity.dxftype() == 'LINE':
+            return np.isclose(entity.dxf.start.x, entity.dxf.end.x, atol=tolerance)
+        elif entity.dxftype() == 'LWPOLYLINE':
+            points = entity.get_points('xy')
+            return all(np.isclose(x1, x2, atol=tolerance) for (x1, y1), (x2, y2) in zip(points[:-1], points[1:]))
+        return False
+
+
+class JobEditorDialog(QDialog):
+    def __init__(self, entities, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('커팅 도면 편집창')
+        self.entities = entities
+        self.job_list = []
+        self.setGeometry(100, 100, 600, 600)
+
+        self.initUI()
+
+    def initUI(self):
+        layout = QHBoxLayout()
+
+        # Add labels for the list widgets
+        all_entities_layout = QVBoxLayout()
+        all_entities_label = QLabel('선 정보')
+        all_entities_layout.addWidget(all_entities_label)
+
+        # List widget to display all entities
+        self.all_entities_list = QListWidget()
+        for i, entity in enumerate(self.entities):
+            layer_name = entity.dxf.layer
+            entity_type = entity.dxftype()
+            item = QListWidgetItem(f'{entity_type} {i + 1} (Layer: {layer_name})')
+            item.setData(Qt.UserRole, i)  # Store the index
+            self.all_entities_list.addItem(item)
+        all_entities_layout.addWidget(self.all_entities_list)
+
+        layout.addLayout(all_entities_layout)
+
+        # Add a label for the job list
+        job_list_layout = QVBoxLayout()
+        job_list_label = QLabel('커팅 순서')
+        job_list_layout.addWidget(job_list_label)
+
+        # List widget to display job list
+        self.job_list_widget = QListWidget()
+        job_list_layout.addWidget(self.job_list_widget)
+
+        layout.addLayout(job_list_layout)
+
+        # Button layout
+        button_layout = QVBoxLayout()
+
+        add_button = QPushButton('커팅 순서에 추가')
+        add_button.clicked.connect(self.add_to_job_list)
+        button_layout.addWidget(add_button)
+
+        remove_button = QPushButton('커팅 순서에서 삭제')
+        remove_button.clicked.connect(self.remove_from_job_list)
+        button_layout.addWidget(remove_button)
+
+        add_all_button = QPushButton('모든 선을 커팅 순서에 추가')
+        add_all_button.clicked.connect(self.add_all_to_job_list)
+        button_layout.addWidget(add_all_button)
+
+        save_button = QPushButton('저장')
+        save_button.clicked.connect(self.save_dxf)
+        button_layout.addWidget(save_button)
+
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
+
+    def add_to_job_list(self):
+        selected_items = self.all_entities_list.selectedItems()
+        for item in selected_items:
+            entity_index = item.data(Qt.UserRole)
+            self.job_list.append(self.entities[entity_index])
+
+            layer_name = self.entities[entity_index].dxf.layer
+            entity_type = self.entities[entity_index].dxftype()
+            job_item = QListWidgetItem(f'{entity_type} {entity_index + 1} (Layer: {layer_name})')
+            job_item.setData(Qt.UserRole, entity_index)
+            self.job_list_widget.addItem(job_item)
+
+    def remove_from_job_list(self):
+        selected_items = self.job_list_widget.selectedItems()
+        for item in selected_items:
+            index = self.job_list_widget.row(item)
+            del self.job_list[index]
+            self.job_list_widget.takeItem(index)
+
+    def add_all_to_job_list(self):
+        # Iterate over all entities and add them to the job list
+        for i, entity in enumerate(self.entities):
+            # Append the entity to the job list
+            self.job_list.append(entity)
+
+            # Add a new item to the job list widget with updated information
+            layer_name = entity.dxf.layer
+            entity_type = entity.dxftype()
+            job_item = QListWidgetItem(f'{entity_type} {i + 1} (Layer: {layer_name})')
+            job_item.setData(Qt.UserRole, i)
+            self.job_list_widget.addItem(job_item)
+
+    def save_dxf(self):
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save DXF File", "", "DXF Files (*.dxf);;All Files (*)")
+        if file_path:
+            new_doc = ezdxf.new(dxfversion='R2010')
+            new_msp = new_doc.modelspace()
+            for entity in self.job_list:
+                if entity.dxftype() == 'LWPOLYLINE':
+                    new_msp.add_lwpolyline(entity.get_points('xy'), dxfattribs=entity.dxfattribs())
+                elif entity.dxftype() == 'LINE':
+                    new_msp.add_line(entity.dxf.start, entity.dxf.end, dxfattribs=entity.dxfattribs())
+            new_doc.saveas(file_path)
+            QMessageBox.information(self, "Saved", f"File saved to {file_path}")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    dxf_path = 'test3.dxf'  # 기본 DXF 파일 경로
+    dxf_path = 'test5_topleft.dxf'  # 기본 DXF 파일 경로
     viewer = DXFViewer(dxf_path)
     viewer.show()
     sys.exit(app.exec_())

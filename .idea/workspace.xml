@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="added: select all entities, unselect all entities to View Menu">
+    <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="modified: bigger arrow size and text">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test_ui(pyqtgraph).py" beforeDir="false" afterPath="$PROJECT_DIR$/test_ui(pyqtgraph).py" afterDir="false" />
     </list>
@@ -124,7 +124,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722867185126</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="modified: bigger arrow size and text">
+      <option name="closed" value="true" />
+      <created>1722867520853</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1722867520853</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -145,6 +153,7 @@
     <MESSAGE value="apply UI" />
     <MESSAGE value="bugfix: entity list show &amp; hide checkbox" />
     <MESSAGE value="added: select all entities, unselect all entities to View Menu" />
-    <option name="LAST_COMMIT_MESSAGE" value="added: select all entities, unselect all entities to View Menu" />
+    <MESSAGE value="modified: bigger arrow size and text" />
+    <option name="LAST_COMMIT_MESSAGE" value="modified: bigger arrow size and text" />
   </component>
 </project>
