@@ -4,6 +4,7 @@ import pyqtgraph as pg
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QListWidget, \
     QMessageBox, QMenuBar, QAction, QFileDialog, QListWidgetItem, QAbstractItemView, QSlider, QLabel, QDialog
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QFont
 import numpy as np
 
 
@@ -275,13 +276,19 @@ class DXFViewer(QMainWindow):
                         arrow_angle = angle
 
                     arrow = pg.ArrowItem(pos=(start[0], start[1]), angle=arrow_angle, tipAngle=45, baseAngle=30,
-                                         headLen=10,
+                                         headLen=15,
                                          tailLen=0, brush=self.arrow_color)
                     self.plot_item.addItem(arrow)
                 if self.show_order:
                     start_x, start_y = vertices[0]
                     text = pg.TextItem(text=str(idx + 1), color=self.order_text_color, anchor=(0, 0))
                     text.setPos(start_x, start_y)
+
+                    # Create a font object and set the size
+                    font = QFont()
+                    font.setPointSize(18)  # 글자 크기를 18pt로 설정
+                    text.setFont(font)
+
                     self.plot_item.addItem(text)
             elif entity.dxftype() == 'LINE':
                 start = entity.dxf.start
@@ -309,7 +316,7 @@ class DXFViewer(QMainWindow):
                         arrow_angle = angle
 
                     arrow = pg.ArrowItem(pos=(start.x, start.y), angle=arrow_angle, tipAngle=45, baseAngle=30,
-                                         headLen=10,
+                                         headLen=15,
                                          tailLen=0, brush=self.arrow_color)
                     self.plot_item.addItem(arrow)
                 if self.show_order:
