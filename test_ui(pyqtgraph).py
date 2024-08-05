@@ -73,6 +73,15 @@ class DXFViewer(QMainWindow):
         self.simulate_action.triggered.connect(self.start_simulation)
         view_menu.addAction(self.simulate_action)
 
+        # Add Show All Lines and Hide All Lines to the View menu
+        show_all_action = QAction('Show All Lines', self)
+        show_all_action.triggered.connect(self.show_all_entities)
+        view_menu.addAction(show_all_action)
+
+        hide_all_action = QAction('Hide All Lines', self)
+        hide_all_action.triggered.connect(self.hide_all_entities)
+        view_menu.addAction(hide_all_action)
+
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
@@ -129,6 +138,24 @@ class DXFViewer(QMainWindow):
         self.entities = list(self.msp.query('LWPOLYLINE LINE'))
         self.entity_visibility = [True] * len(self.entities)
         self.update_list_widget()
+        self.visualize_entities()
+
+    def show_all_entities(self):
+        self.list_widget.blockSignals(True)  # 시그널 차단하여 불필요한 이벤트 방지
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            item.setCheckState(Qt.Checked)
+            self.entity_visibility[i] = True
+        self.list_widget.blockSignals(False)
+        self.visualize_entities()
+
+    def hide_all_entities(self):
+        self.list_widget.blockSignals(True)  # 시그널 차단하여 불필요한 이벤트 방지
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            item.setCheckState(Qt.Unchecked)
+            self.entity_visibility[i] = False
+        self.list_widget.blockSignals(False)
         self.visualize_entities()
 
     def update_list_widget(self):

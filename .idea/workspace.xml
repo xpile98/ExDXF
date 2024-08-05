@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="apply UI">
-      <change beforePath="$PROJECT_DIR$/.idea/EzDXF.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/EzDXF.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="bba2b7bc-e16a-481a-b596-149b7b8933d1" name="Changes" comment="bugfix: entity list show &amp; hide checkbox">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test_ui(pyqtgraph).py" beforeDir="false" afterPath="$PROJECT_DIR$/test_ui(pyqtgraph).py" afterDir="false" />
     </list>
@@ -50,7 +48,7 @@
   "keyToString": {
     "Python.__init__.executor": "Run",
     "Python.test_line-order.executor": "Run",
-    "Python.test_ui(pyqtgraph).executor": "Debug",
+    "Python.test_ui(pyqtgraph).executor": "Run",
     "Python.test_ui.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
@@ -110,7 +108,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722307170165</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="bugfix: entity list show &amp; hide checkbox">
+      <option name="closed" value="true" />
+      <created>1722865932677</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1722865932677</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -129,17 +135,7 @@
     <MESSAGE value="line order visualiztion -ok" />
     <MESSAGE value="line order visualiztion 2 -ok" />
     <MESSAGE value="apply UI" />
-    <option name="LAST_COMMIT_MESSAGE" value="apply UI" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/test_ui(pyqtgraph).py</url>
-          <line>147</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="bugfix: entity list show &amp; hide checkbox" />
+    <option name="LAST_COMMIT_MESSAGE" value="bugfix: entity list show &amp; hide checkbox" />
   </component>
 </project>
